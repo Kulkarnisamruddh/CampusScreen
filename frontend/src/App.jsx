@@ -36,30 +36,67 @@ export default function App() {
   }
 
   async function screenResumes() {
-    if (!jd) { setError("Please enter a job description"); return; }
-    if (files.length === 0) { setError("Please upload at least one PDF"); return; }
-    setError("")
-    setLoading(true)
-    setResults([])
+  if (!jd) { setError("Please enter a job description"); return; }
+  if (files.length === 0) { setError("Please upload at least one PDF"); return; }
+  setError("")
+  setLoading(true)
+  setResults([])
 
-    const formData = new FormData()
-    for (let f of files) formData.append("files", f)
-    formData.append("job_description", jd)
+  const formData = new FormData()
+  for (let f of files) formData.append("files", f)
+  formData.append("job_description", jd)
 
-    try {
-      const res = await fetch("https://campusscreen-production.up.railway.app/api/rank", {
-        method: "POST",
-        body: formData
-      })
-      const data = await res.json()
-      setResults(data)
-      if (!user) setGuestScreenings(prev => prev + 1)
-    } catch (err) {
-      setError("Something went wrong. Is the backend running?")
-    } finally {
-      setLoading(false)
+  try {
+    const res = await fetch("https://campusscreen-production.up.railway.app/api/rank", {
+      method: "POST",
+      body: formData
+    })
+    const data = await res.json()
+    setResults(data)
+
+    if (!user) {
+      setGuestScreenings(prev => prev + 1)
+    } else {
+      // Save to database
+      const { data: session, error: sessionError } = await supabase
+        .from("sessions")
+        .insert({
+          user_id: user.id,
+          job_title: jd.substring(0, 50),
+          job_description: jd,
+          total_resumes: data.length
+        })
+        .select()
+        .single()
+
+      if (!sessionError && session) {
+        const resumeRows = data.map(r => ({
+          session_id: session.id,
+          filename: r.filename,
+          rank: r.rank,
+          score: r.score,
+          summary: r.summary,
+          strengths: r.strengths,
+          weaknesses: r.weaknesses,
+          red_flags: r.red_flags,
+          detected_role: r.detected_role,
+          experience_level: r.experience_level,
+          cgpa: r.cgpa,
+          batch_year: r.batch_year,
+          branch: r.branch,
+          location: r.location,
+          skills_detected: r.skills_detected
+        }))
+
+        await supabase.from("resume_results").insert(resumeRows)
+      }
     }
+  } catch (err) {
+    setError("Something went wrong. Is the backend running?")
+  } finally {
+    setLoading(false)
   }
+}
 
   function downloadCSV() {
     const headers = ["Rank", "Filename", "Score", "Summary", "Strengths", "Weaknesses", "Red Flags"]
