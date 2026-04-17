@@ -28,7 +28,7 @@ For each resume extract and provide:
 4. Top 3 weaknesses
 5. Red flags (if any)
 6. One line summary
-7. Detected role (exactly one of: Web Developer, ML/AI Engineer, Java Developer, Python Developer, Data Analyst, DevOps Engineer, Mobile Developer, Other)
+7. Detected role (exactly one of: Web Developer, ML/AI Engineer, Java Developer, Python Developer, Data Analyst, DevOps Engineer, Mobile Developer, UI/UX Designer, Product Manager, QA Tester, Cloud Architect, Business Analyst, HR/Recruiter, Cyber Security, Other)
 8. Experience level (exactly one of: Fresher, 1-2 years, 3-5 years, 5+ years)
 9. CGPA (extract exact number from resume, null if not found)
 10. Batch year (graduation year as number, null if not found)
@@ -87,7 +87,7 @@ For each resume extract and provide:
 3. Top 3 weaknesses
 4. Red flags (if any)
 5. One line summary
-6. Detected role (exactly one of: Web Developer, ML/AI Engineer, Java Developer, Python Developer, Data Analyst, DevOps Engineer, Mobile Developer, Other)
+6. Detected role (exactly one of: Web Developer, ML/AI Engineer, Java Developer, Python Developer, Data Analyst, DevOps Engineer, Mobile Developer, UI/UX Designer, Product Manager, QA Tester, Cloud Architect, Business Analyst, HR/Recruiter, Cyber Security, Other)
 7. Experience level (exactly one of: Fresher, 1-2 years, 3-5 years, 5+ years)
 8. CGPA (extract exact number, null if not found)
 9. Batch year (graduation year, null if not found)
