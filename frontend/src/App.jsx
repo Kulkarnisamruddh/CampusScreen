@@ -460,7 +460,12 @@ export default function App() {
           )}
 
           {results.length > 0 && (() => {
-            const roles = ["All", ...new Set(results.map(r => r.detected_role))]
+            const roles = [
+              "All", "Web Developer", "ML/AI Engineer", "Java Developer", "Python Developer", 
+              "Data Analyst", "DevOps Engineer", "Mobile Developer", "UI/UX Designer", 
+              "Product Manager", "QA Tester", "Cloud Architect", "Business Analyst", 
+              "HR/Recruiter", "Cyber Security", "Other"
+            ]
             const filteredResults = roleFilter === "All" ? results : results.filter(r => r.detected_role === roleFilter)
             
             return (
