@@ -176,9 +176,7 @@ export default function App() {
       {/* Navbar */}
       <nav className="border-b border-slate-700 px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span style={{color:"white", fontWeight:"bold", fontSize:"14px"}}>CS</span>
-          </div>
+          <img src="/logo.png" alt="ScreenIQ Logo" className="w-8 h-8 object-contain" />
           <span className="text-white font-bold text-lg">ScreenIQ</span>
           <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">Beta</span>
         </div>
@@ -328,9 +326,7 @@ export default function App() {
           <footer className="border-t border-slate-700 px-8 py-8">
             <div className="max-w-5xl mx-auto flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <span style={{color:"white", fontWeight:"bold", fontSize:"10px"}}>CS</span>
-                </div>
+                <img src="/logo.png" alt="ScreenIQ Logo" className="w-6 h-6 object-contain" />
                 <span className="text-white font-bold">ScreenIQ</span>
               </div>
               <div className="flex gap-8 text-slate-400 text-sm">

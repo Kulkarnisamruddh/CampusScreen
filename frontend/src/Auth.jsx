@@ -62,9 +62,7 @@ export default function Auth({ onLogin }) {
         
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span style={{color:"white", fontWeight:"bold", fontSize:"14px"}}>CS</span>
-          </div>
+          <img src="/logo.png" alt="ScreenIQ Logo" className="w-8 h-8 object-contain" />
           <span className="text-white font-bold text-lg">ScreenIQ</span>
         </div>
 
