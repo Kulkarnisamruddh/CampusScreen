@@ -58,3 +58,6 @@ npm run dev
 ## 👨‍💻 Built By
 **Samruddhi Kulkarni** — Chhatrapati Sambhajinagar, India  
 [LinkedIn](https://www.linkedin.com/in/samruddhi-kulkarni-31a653261) | [Email](mailto:samruddhi.kulkarni72@gmail.com)
+
+## 📄 License
+This project is licensed under the [MIT License](LICENSE).
