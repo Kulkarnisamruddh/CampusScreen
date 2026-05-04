@@ -1,7 +1,82 @@
 import { useState, useEffect } from "react"
 import { supabase } from "./supabase"
 import Auth from "./Auth"
+import History from "./History"
 import emailjs from "@emailjs/browser"
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend
+} from "recharts"
+
+// ── Analytics Panel ─────────────────────────────────────────────────────────
+const PIE_COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899"]
+
+function AnalyticsPanel({ results }) {
+  const buckets = [
+    { label: "90+",   count: results.filter(r => r.score >= 90).length },
+    { label: "80–89", count: results.filter(r => r.score >= 80 && r.score < 90).length },
+    { label: "70–79", count: results.filter(r => r.score >= 70 && r.score < 80).length },
+    { label: "60–69", count: results.filter(r => r.score >= 60 && r.score < 70).length },
+    { label: "<60",   count: results.filter(r => r.score < 60).length },
+  ]
+
+  const roleCounts = {}
+  results.forEach(r => {
+    const role = r.detected_role || "Unknown"
+    roleCounts[role] = (roleCounts[role] || 0) + 1
+  })
+  const roleData = Object.entries(roleCounts).map(([name, value]) => ({ name, value }))
+
+  return (
+    <div className="mt-10 mb-6 grid grid-cols-2 gap-6">
+      {/* Score Distribution */}
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h3 className="text-white font-semibold mb-1">Score Distribution</h3>
+        <p className="text-slate-500 text-xs mb-4">Candidates grouped by score range</p>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={buckets} barSize={36}>
+            <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 12 }} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={{ fill: "#94a3b8", fontSize: 12 }} axisLine={false} tickLine={false} />
+            <Tooltip
+              contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8, color: "#f1f5f9" }}
+              cursor={{ fill: "rgba(99,102,241,0.1)" }}
+            />
+            <Bar dataKey="count" name="Candidates" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Role Distribution */}
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h3 className="text-white font-semibold mb-1">Role Distribution</h3>
+        <p className="text-slate-500 text-xs mb-4">Breakdown of detected candidate roles</p>
+        <ResponsiveContainer width="100%" height={200}>
+          <PieChart>
+            <Pie
+              data={roleData}
+              cx="50%" cy="50%"
+              innerRadius={50} outerRadius={80}
+              paddingAngle={3}
+              dataKey="value"
+            >
+              {roleData.map((_, i) => (
+                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8, color: "#f1f5f9" }}
+            />
+            <Legend
+              iconType="circle"
+              iconSize={8}
+              formatter={(value) => <span style={{ color: "#94a3b8", fontSize: 11 }}>{value}</span>}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )
+}
 
 export default function App() {
   const [files, setFiles] = useState([])
@@ -18,6 +93,7 @@ export default function App() {
   const [guestScreenings, setGuestScreenings] = useState(0)
   const [authLoading, setAuthLoading] = useState(true)
   const [showAuth, setShowAuth] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -170,6 +246,24 @@ export default function App() {
 
   if (showAuth) return <Auth onLogin={(u) => { setUser(u); setShowAuth(false); }} />
 
+  if (showHistory) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+      <nav className="border-b border-slate-700 px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="ScreenIQ Logo" className="w-8 h-8 object-contain" />
+          <span className="text-white font-bold text-lg">ScreenIQ</span>
+          <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">Beta</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-slate-400 text-sm">{user.email}</span>
+          <button onClick={() => setShowHistory(false)} className="border border-slate-600 hover:border-slate-400 text-slate-300 px-4 py-2 rounded-xl text-sm transition-colors">← Back</button>
+          <button onClick={handleLogout} className="border border-red-600 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">Logout</button>
+        </div>
+      </nav>
+      <History user={user} onBack={() => setShowHistory(false)} />
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
 
@@ -189,6 +283,13 @@ export default function App() {
                 className="border border-slate-600 hover:border-slate-400 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
               >
                 Give Feedback
+              </button>
+              <button
+                id="my-history-btn"
+                onClick={() => setShowHistory(true)}
+                className="border border-slate-600 hover:border-blue-500 hover:text-blue-400 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              >
+                📋 My History
               </button>
               <button
                 onClick={() => setShowTool(true)}
@@ -466,6 +567,7 @@ export default function App() {
             
             return (
             <div className="mt-10">
+              <AnalyticsPanel results={results} />
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-4">
                   <h2 className="text-2xl font-bold text-white">{filteredResults.length} Candidates Ranked</h2>
